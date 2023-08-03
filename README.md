@@ -1,9 +1,9 @@
-MySQL Workbench, Python 활용 분석
+# MySQL Workbench, Python 활용 분석
 
 ![image](https://github.com/plintAn/MySQL-Pratice-Titanic/assets/124107186/c8787384-1090-4552-882c-887669d788be)
 
 
-# MySQL 분석
+# MySQL Workbench 데이터 분석과 파이썬을 이용한 시각화
 
 데이터 가져오기
 
@@ -21,7 +21,6 @@ GROUP BY Sex;
 PassengerId	Survived	Pclass	Name	Sex	Age	SibSp	Parch	Ticket	Fare	Cabin	Embarked
 ![image](https://github.com/plintAn/MySQL-Pratice-Titanic/assets/124107186/1e6db166-6c12-41f1-b867-8e2e88c3a49e)
 
-해당 컬럼들을 봤을 때 생존에 유리한 조건들은 다음과 같을 것 같습니다.
 
 
 # 데이터 전처리
@@ -54,10 +53,9 @@ GROUP BY Title;
 |  Ms.   |  28.0000  |    100.0000  |  0.1401   |
 | Others |  20.3115  |    52.4590   |  8.5434   |
 
-Ms(여성) > Mrs(기혼여성) > Miss(미혼여성) > Others > Mr(남성) 순으로 생존율이 높습니다
-
-
-여기에 연령이 표시되지 않은 other에 평균연령으로 계산. 
+- Ms(여성) > Mrs(기혼여성) > Miss(미혼여성) > Others > Mr(남성) 순으로 생존율이 높습니다
+- 여기에 연령이 표시되지 않은 other에 평균연령으로 계산.
+- 
 ```sql
 UPDATE train
 SET Age = (SELECT AVG(Age) FROM train WHERE Name LIKE '%Miss.%' AND Age IS NOT NULL)
@@ -100,9 +98,8 @@ GROUP BY Title;
 |  Mr.   |  32.3869  |    16.8342   |  55.7423  |
 |  Ms.   |  28.0000  |    100.0000  |  0.1401   |
 
-계산 결과는 다음과 같고. 데이터를 분석해본 결과 절반 이상의 otheres는 어린 남자 였습니다.
-
-기혼여성 > 미혼여성 > 어린남성 > 어른남성 순으로 생존율이 높은 것을 확인했습니다.
+- 계산 결과는 다음과 같고. 데이터를 분석해본 결과 절반 이상의 otheres는 어린 남자 였습니다.
+- 기혼여성 > 미혼여성 > 어린남성 > 어른남성 순으로 생존율이 높은 것을 확인했습니다.
 
 
 
@@ -111,7 +108,7 @@ GROUP BY Title;
 
 ### 성별별 생존률 분석: 
 
-gender_submission 테이블과 passengers 테이블을 조인하여 성별별 생존율을 계산
+- gender_submission 테이블과 passengers 테이블을 조인하여 성별별 생존율을 계산
 
 ```sql
 SELECT sex, AVG(survived) as survival_rate
@@ -126,9 +123,7 @@ GROUP BY sex;
 | female |  0.7548  |
 
 
-
-
-결과는 예쌍대로 여자 생존율은 74%, 남자 생존율 19% 즉, 여자 탑승객 100명 중 74% 생존 남자 탑승객 100명 중 19% 생존율을 보여준다.
+- 결과는 예쌍대로 여자 생존율은 74%, 남자 생존율 19% 즉, 여자 탑승객 100명 중 74% 생존 남자 탑승객 100명 중 19% 생존율을 보여준다.
 
 
 ### 객실 등급별 생존률 분석: 
@@ -149,9 +144,8 @@ GROUP BY Pclass;
 |--------|---------------|
 
 
-분석 결과 3등석 생존율 24%, 2등석 47%, 1등석 63%로 나왔습니다
-
-생각대로 1등석 > 2등석 > 3등석 순으로 생존율이 높았고, 특히 3등석 생존율이 낮았습니다.
+- 분석 결과 3등석 생존율 24%, 2등석 47%, 1등석 63%로 나왔습니다
+- 1등석 > 2등석 > 3등석 순으로 생존율이 높았고, 특히 3등석 생존율이 낮았습니다.
 
 
 ### 연령대별 생존률 분석: 연령대별로 분류하여 생존률을 계산
@@ -175,17 +169,16 @@ GROUP BY age_range;
 
 | age_range | survival_rate |
 |-----------|---------------|
-|   20-29   |    0.3500     |
-|   30-39   |    0.4371     |
-|   50-59   |    0.4167     |
 |    0-9    |    0.6129     |
 |   10-19   |    0.4020     |
+|   20-29   |    0.3500     |
+|   30-39   |    0.4371     |
 |   40-49   |    0.3820     |
+|   50-59   |    0.4167     |
 |   60-69   |    0.3158     |
 |   70-79   |    0.0000     |
-|           |    1.0000     |
+|   others  |    1.0000     |
 |-----------|---------------|
-
 
 연령 별 생존율은 0-9: 61%, 10-19: 40%, 20-29 : 35%, 30-39 43%, 40-49 : 38%, 50-59 : 41%, 60-69 : 31%, 70-79 : 0%, 80- : 100%
 
@@ -614,8 +607,93 @@ plt.show()
 - 
 
 
+자 이제 데이터 분석을 가지고 최종 산출물을 만들어 보겠습니다
+
+머신러닝 모델 : 랜덤 포레스트 분류기, 그리드 검색을 통한 하이퍼 파라미터 튜닝
 
 
+```python
+import pandas as pd
+from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score
+from sklearn.preprocessing import LabelEncoder
+from sklearn.ensemble import RandomForestClassifier
+
+# 데이터 불러오기
+file_path = "your.csv"
+data = pd.read_csv(file_path)
+
+# 결측치 처리
+data['Age'].fillna(data['Age'].median(), inplace=True)
+data['Embarked'].fillna(data['Embarked'].mode()[0], inplace=True)
+
+# 범주형 데이터 인코딩
+label_encoder = LabelEncoder()
+data['Sex'] = label_encoder.fit_transform(data['Sex'])
+data['Embarked'] = label_encoder.fit_transform(data['Embarked'])
+
+# 특성 선택 및 추가
+X = data[['Sex', 'Pclass', 'Age', 'SibSp', 'Parch', 'Fare', 'Embarked']]
+y = data['Survived']
+
+# 훈련 세트와 테스트 세트 분할
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# 모델 생성
+model = RandomForestClassifier()
+
+# 하이퍼파라미터 튜닝
+param_grid = {
+    'n_estimators': [100, 200],
+    'max_depth': [10, 20],
+    'min_samples_split': [2, 5]
+}
+
+grid_search = GridSearchCV(model, param_grid, cv=5)
+grid_search.fit(X_train, y_train)
+
+# 최적의 모델
+best_model = grid_search.best_estimator_
+
+# 예측
+y_pred = best_model.predict(X_test)
+
+# 성능 평가
+accuracy = accuracy_score(y_test, y_pred)
+print('Accuracy:', accuracy)
+
+print(X_train.shape, y_train.shape, X_test.shape)
+X_train.head()
+```
+
+
+## 데이터 전처리:
+
+- 결측치 처리: 'Age'의 결측값은 중앙값으로 대체, 'Embarked'의 결측값은 최빈값으로 대체
+- 범주형 변수 인코딩: 'Sex', 'Embarked'
+- 특성 선택: 'Sex', 'Pclass', 'Age', 'SibSp', 'Parch', 'Fare', 'Embarked'
+
+데이터 분할: 훈련 세트 80%, 테스트 세트 20%
+
+모델 선택: 랜덤 포레스트 분류기
+
+### 하이퍼파라미터 튜닝:
+
+- n_estimators: [100, 200]
+- max_depth: [10, 20]
+- min_samples_split: [2, 5]
+- 모델 훈련: 최적의 하이퍼파라미터로 훈련
+
+### 예측: 테스트 세트를 사용해 예측
+
+### 성능 평가:
+
+정확도: 약 0.8212 (82.12%)
+
+아직 부족한 것이 많지만.. 캐글에 제출을 합니다.
+
+![image](https://github.com/plintAn/MySQL-Pratice-Titanic/assets/124107186/fa08056f-93f1-4a69-a96d-4c93fcb31fe8)
 
 
 
